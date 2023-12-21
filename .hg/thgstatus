@@ -1,0 +1,10 @@
+msrc/main/java/base
+msrc/main/java/pages
+msrc/main/java/stepDefination
+rsrc/main/java/utility
+msrc/test/java/featureFiles
+mtarget/classes/base
+mtarget/classes/pages
+mtarget/classes/stepDefination
+rtarget/classes/utility
+mtarget/test-classes/featureFiles
