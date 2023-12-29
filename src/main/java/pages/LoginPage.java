@@ -6,14 +6,14 @@ import utility.PropOperation;
 
 
 public class LoginPage extends PredefinedActions {
-	private PropOperation propOperation;
+	public PropOperation propOperation;
 	
 	public LoginPage() {
 		propOperation = new PropOperation(ConstantPath.LOGINPAGELOCATORS);
 	}
 	
 	public boolean isLogoVisible() {
-		System.out.print("logo"+propOperation.getValue("logo"));
+		//System.out.print("logo"+propOperation.getValue("logo"));
 		return isDisplayed(propOperation.getValue("logo"), true);
 	}
 	

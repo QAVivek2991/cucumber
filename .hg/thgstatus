@@ -1,10 +1,7 @@
-msrc/main/java/base
-msrc/main/java/pages
-msrc/main/java/stepDefination
+m.git
+rsrc/main/java/runner
 rsrc/main/java/utility
-msrc/test/java/featureFiles
-mtarget/classes/base
-mtarget/classes/pages
-mtarget/classes/stepDefination
+rsrc/test/java/featureFiles
+rtarget/classes/runner
 rtarget/classes/utility
-mtarget/test-classes/featureFiles
+rtarget/surefire-reports

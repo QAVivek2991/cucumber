@@ -5,7 +5,7 @@ import constant.ConstantPath;
 import utility.PropOperation;
 
 public class DashboardPage extends PredefinedActions {
-private PropOperation propOperation;
+public PropOperation propOperation;
 	
 	public DashboardPage() {
 		propOperation = new PropOperation(ConstantPath.DASHBOARDPAGELOCATORS);
