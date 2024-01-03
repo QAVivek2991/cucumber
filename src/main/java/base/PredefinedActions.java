@@ -1,13 +1,19 @@
 package base;
 
-
-
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -15,14 +21,16 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ThreadGuard;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
+import customException.InvalidLocatorType;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import stepDefination.AutomationHooks;
 
 public class PredefinedActions {
 
@@ -33,71 +41,89 @@ public class PredefinedActions {
 
 	// ----------------------------------------- Web Automation
 	// ---------------------------------------------------------------
-	
+
 	public static WebDriver getDriver() {
 		return webDriver.get();
 	}
-	public void configureSelenium(String browser, Boolean useWebDriverManager) {
-		//String browser = Strings.isNullOrEmpty(System.getProperty("browserName")) ? "chrome": System.getProperty("browserName");
-		System.out.println("Browser - "+ System.getProperty("browser"));
-		
-		if(useWebDriverManager==true) {
+
+	public static String readPropertyValue(String propertyKey) throws IOException, XmlPullParserException {
+		MavenXpp3Reader reader = new MavenXpp3Reader();
+		Model model;
+		String propertyValue = null;
+		try {
+			FileReader fileReader = new FileReader("pom.xml");
+			model = reader.read(fileReader);
+			propertyValue = model.getProperties().getProperty(propertyKey);
+			return propertyValue;
+		} catch (IOException | XmlPullParserException e) {
+			e.printStackTrace();
+			return propertyValue;
+		}
+	}
+
+	public void configureSelenium(String browser, String useWebDriverManager) {
+		if (useWebDriverManager.equals("true")) {
 			switch (browser.toLowerCase()) {
 			case "chrome":
 				WebDriverManager.chromedriver().setup();
 				webDriver.set(ThreadGuard.protect(new ChromeDriver()));
-				//webDriver = new ChromeDriver();
+				// webDriver = new ChromeDriver();
 				break;
 			case "firefox":
 				WebDriverManager.firefoxdriver().setup();
 				webDriver.set(ThreadGuard.protect(new FirefoxDriver()));
-				//webDriver = new FirefoxDriver();
+				// webDriver = new FirefoxDriver();
 				break;
 			case "edge":
 				WebDriverManager.edgedriver().setup();
 				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
-				//webDriver = new EdgeDriver();
+				// webDriver = new EdgeDriver();
 				break;
 			default:
 				WebDriverManager.edgedriver().setup();
 				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
-				//webDriver = new EdgeDriver();
+				// webDriver = new EdgeDriver();
 				break;
-		}
-		}else {
+			}
+		} else {
 			switch (browser.toLowerCase()) {
 			case "chrome":
 				System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
 				webDriver.set(ThreadGuard.protect(new ChromeDriver()));
-				//webDriver = new ChromeDriver();
+				// webDriver = new ChromeDriver();
 				break;
 			case "firefox":
 				System.setProperty("webdriver.gecko.driver", "path/to/geckodriver");
 				webDriver.set(ThreadGuard.protect(new FirefoxDriver()));
-				//webDriver = new FirefoxDriver();
+				// webDriver = new FirefoxDriver();
 				break;
 			case "edge":
 				System.setProperty("webdriver.edge.driver", "path/to/msedgedriver");
 				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
-				//webDriver = new EdgeDriver();
+				// webDriver = new EdgeDriver();
 				break;
 			default:
 				System.setProperty("webdriver.edge.driver", "path/to/msedgedriver");
 				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
-				//webDriver = new EdgeDriver();
+				// webDriver = new EdgeDriver();
 				break;
-			
+
+			}
 		}
 	}
-	}
 
-	public void openWebSite(String url) {
-		configureSelenium("edge", true);
+	public void openWebSite(String url) throws IOException, XmlPullParserException {
+		String browserName = AutomationHooks.browserName;
+		System.out.println("Browser - " + browserName);
+		String useWebdriverManager = AutomationHooks.useWebdriverManager;
+		System.out.println("Webdriver - " + useWebdriverManager);
+		configureSelenium(AutomationHooks.browserName, useWebdriverManager);
+		//configureSelenium("chrome", "true");
 		getDriver().manage().window().maximize();
 		getDriver().get(url);
 	}
 
-	public void start() {
+	public void start() throws IOException, XmlPullParserException {
 		openWebSite("https://staging.connect.pressurepro.us/");
 	}
 
@@ -105,123 +131,221 @@ public class PredefinedActions {
 		getDriver().close();
 	}
 
-	// ------------------------------------ Common methods
-	// -----------------------------------------------------------------
-	public By getElementBy(String locator) {
-		By elementBy = null;
+	private By getLocatorBy(String locator) {
 		String[] temp = locator.split("]:-");
-		temp[0] = temp[0].substring(1).toUpperCase();
+		String locatorType = temp[0].replace("[", "").toUpperCase();
+		String locatorValue = temp[1];
 
-		switch (temp[0]) {
-		case "ID":
-			elementBy = By.id(temp[1]);
-			break;
+		switch (locatorType) {
 		case "XPATH":
-			elementBy = By.xpath(temp[1]);
-			break;
+			return By.xpath(locatorValue);
+		case "ID":
+			return By.id(locatorValue);
 		case "CSS":
-			elementBy = By.cssSelector(temp[1]);
-			break;
+			return By.cssSelector(locatorValue);
+		default:
+			throw new InvalidLocatorType(locatorType + " is not valid");
 		}
-		return elementBy;
+
 	}
 
-	public WebElement getElementAfterClickable(String locator) {
-		By elementBy = getElementBy(locator);
+	protected WebElement getElement(String locator, boolean isWaitRequired) {
 		WebElement element = null;
-		WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(30));
-		element = wait.until(ExpectedConditions.elementToBeClickable(elementBy));
+		By by = getLocatorBy(locator);
+		if (isWaitRequired) {
+			WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(30));
+			element = wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+		} else
+			element = getDriver().findElement(by);
 		return element;
 	}
 
-	public WebElement getElement(String locator, boolean isWaitRequired) {
-		By elementBy = getElementBy(locator);
-		WebElement element = null;
-		if (isWaitRequired == true) {
-			WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(30));
-			element = wait.until(ExpectedConditions.visibilityOfElementLocated(elementBy));
-		} else {
-			element = getDriver().findElement(elementBy);
-		}
+	protected List<WebElement> getAllElements(String locator, boolean isWaitRequired) {
+		By by = getLocatorBy(locator);
+		List<WebElement> elements = new ArrayList<>();
+		if (isWaitRequired)
+			try {
+				WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(30));
+				elements = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(by));
+			} catch (Exception ae) {
+			}
 
-		return element;
-	}
-
-	public List<WebElement> getElements(String locator, boolean isWaitRequired) {
-		By elementBy = getElementBy(locator);
-		List<WebElement> elements = null;
-		if (isWaitRequired == true) {
-			WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(30));
-			elements = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(elementBy, 0));
-		} else {
-			elements = getDriver().findElements(elementBy);
-		}
+		else
+			elements = getDriver().findElements(by);
 		return elements;
-	}
-
-	public int getCountOfElements(String locator, boolean isWaitRequired) {
-		return getElements(locator, isWaitRequired).size();
-	}
-
-	public List<String> getAllElementText(String locator, boolean isWaitRequired) {
-		List<String> elementText = new ArrayList<String>();
-		List<WebElement> elements = getElements(locator, isWaitRequired);
-		for (WebElement element : elements) {
-			elementText.add(element.getText());
-		}
-		return elementText;
-	}
-
-	public void clickOnElement(String locator, boolean isWaitRequired) {
-		getElement(locator, isWaitRequired).click();
-	}
-
-	public void clickOnElementAfterClicable(String locator, boolean isWaitRequired) {
-		getElementAfterClickable(locator).click();
-	}
-
-	public void sendText(String locator, String value, boolean isWaitRequired) {
-		getElement(locator, isWaitRequired).sendKeys(value);
-	}
-
-	public boolean isDisplayed(String locator, boolean isWaitRequired) {
-		try {
-			WebElement element = getElement(locator, isWaitRequired);
-			if (element.isDisplayed())
-				return true;
-			else
-				return element.isDisplayed();
-		} catch (NoSuchElementException ne) {
-			return false;
-		}
-
-	}
-
-	public boolean isClickable(String locator, boolean isWaitRequired) {
-		boolean flag = false;
-		try {
-			flag = getElement(locator, isWaitRequired).isEnabled();
-		} catch (Exception NoSuchElementFoundException) {
-
-		}
-		return flag;
-	}
-
-	public String getText(String locator, boolean isWaitRequired) {
-		return getElement(locator, isWaitRequired).getText();
 	}
 
 	public String getAttribute(String locator, boolean isWaitRequired, String attributeName) {
 		return getElement(locator, isWaitRequired).getAttribute(attributeName);
 	}
 
-	public void selectByIndex(String locator, boolean isWaitRequired, int index) {
-		select = new Select(getElement(locator, isWaitRequired));
-		select.selectByIndex(index);
+	public void setText(String locator, boolean isWaitRequired, String text) {
+		WebElement element = getElement(locator, isWaitRequired);
+		if (element.isEnabled()) {
+			element.sendKeys(text);
+
+		} else
+			System.out.println(locator + " element is not enabled");
 	}
-	
+
+	public void setText(WebElement element, boolean isWaitRequired, String text) {
+		if (element.isEnabled()) {
+			element.sendKeys(text);
+
+		} else
+			System.out.println("element is not enabled");
+	}
+
+	public boolean waitUntilElementIsClickable(WebElement element) {
+		try {
+			WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(5));
+			wait.until(ExpectedConditions.elementToBeClickable(element));
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean waitUntilElementIsVisible(WebElement element) {
+		try {
+			WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(5));
+			wait.until(ExpectedConditions.visibilityOf(element));
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean isElementClickable(String locator, boolean isWaitRequired) {
+		WebElement element = getElement(locator, isWaitRequired);
+		try {
+			WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(3));
+			wait.until(ExpectedConditions.elementToBeClickable(element));
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public void clickOnElement(String locator, boolean isWaitRequired) {
+		WebElement element = getElement(locator, isWaitRequired);
+		if (waitUntilElementIsClickable(element))
+			element.click();
+		else
+			throw new ElementNotInteractableException(locator + " is not clickable");
+
+	}
+
+	public void clickOnElementAfterVisible(String locator, boolean isWaitRequired) {
+		WebElement element = getElement(locator, isWaitRequired);
+		if (waitUntilElementIsVisible(element))
+			element.click();
+		else
+			throw new ElementNotInteractableException(locator + " is not visible");
+
+	}
+
+	public void clickOnElementUsingAction(String locator, boolean isWaitRequired) {
+		WebElement element = getElement(locator, isWaitRequired);
+		Actions actions = new Actions(getDriver());
+		actions.moveToElement(element).click().build().perform();
+
+	}
+
+	public void clickOnElementUsingJavaScript(String locator, boolean isWaitRequired) {
+		WebElement element = getElement(locator, isWaitRequired);
+		JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+		executor.executeScript("arguments[0].click();", element);
+
+	}
+
+	public void clickOnElement(WebElement element, boolean isWaitRequired) {
+		if (waitUntilElementIsClickable(element))
+			element.click();
+		else
+			throw new ElementNotInteractableException(" Element is not clickable");
+
+	}
+
+	public void pressEnterKey() {
+		Actions actions = new Actions(getDriver());
+		actions.sendKeys(Keys.ENTER).perform();
+
+	}
+
+	public void pressDownArrowKey() {
+		Actions actions = new Actions(getDriver());
+		actions.sendKeys(Keys.ARROW_DOWN).perform();
+
+	}
+
+	protected boolean waitUntilPageTitalToBe(String tital) {
+		WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(30));
+		boolean titalFlag = wait.until(ExpectedConditions.titleIs(tital));
+		return titalFlag;
+	}
+
+	protected List<WebElement> waitUntilNumberOfElementToBoMoreThan(String locator, int count) {
+		By by = getLocatorBy(locator);
+		WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(30));
+		List<WebElement> elements = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, count));
+		return elements;
+	}
+
+	protected boolean isElementDisplayed(String locator, boolean isWaitRequired) {
+		try {
+			WebElement element = getElement(locator, isWaitRequired);
+			if (element.isDisplayed())
+				return true;
+			else
+				// call method to scroll to element
+				return element.isDisplayed();
+		} catch (NoSuchElementException ne) {
+			return false;
+		}
+	}
+
+	public void waitUntilElementIsVisible(String locator) {
+		isElementDisplayed(locator, true);
+	}
+
+	public boolean isElementVisible(String locator) {
+		return isElementDisplayed(locator, true);
+	}
+
+	public void waitUntilElementIsInVisible(String locator) {
+		WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(30));
+		wait.until(ExpectedConditions.invisibilityOf(getElement(locator, true)));
+	}
+
+	public String getElementText(String locator, boolean isWaitRequired) {
+		return getElement(locator, isWaitRequired).getText();
+	}
+
+	public List<String> getAllElementsText(String locator, boolean isWaitRequired) {
+		List<WebElement> elements = getAllElements(locator, isWaitRequired);
+		List<String> AllElementstext = new ArrayList<String>();
+		for (int i = 0; i < elements.size(); i++)
+			AllElementstext.add(elements.get(i).getText());
+		return AllElementstext;
+	}
+
+	public String getElementText(WebElement element) {
+		return element.getText();
+	}
+
+	public void selectByText(WebElement element, String valueToSelect) {
+		select = new Select(element);
+		select.selectByVisibleText(valueToSelect);
+	}
+
+	public void scrollToElement() {
+		JavascriptExecutor js = (JavascriptExecutor) getDriver();
+		js.executeScript("scrollBy(0, 4500)");
+	}
+
 	public byte[] takeScreenshot() {
-		TakesScreenshot ts = (TakesScreenshot)getDriver();
+		TakesScreenshot ts = (TakesScreenshot) getDriver();
 		return ts.getScreenshotAs(OutputType.BYTES);
 	}
 

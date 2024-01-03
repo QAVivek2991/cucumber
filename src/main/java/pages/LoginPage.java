@@ -14,11 +14,11 @@ public class LoginPage extends PredefinedActions {
 	
 	public boolean isLogoVisible() {
 		//System.out.print("logo"+propOperation.getValue("logo"));
-		return isDisplayed(propOperation.getValue("logo"), true);
+		return isElementDisplayed(propOperation.getValue("logo"), true);
 	}
 	
 	public boolean isConnectTextVisible() {
-		return isDisplayed(propOperation.getValue("connectText"), true);
+		return isElementDisplayed(propOperation.getValue("connectText"), true);
 	}
 	
 	public String getEmailPlaceholder() {
@@ -30,23 +30,23 @@ public class LoginPage extends PredefinedActions {
 	}
 	
 	public boolean isRememberMeClickable() {
-		return isClickable(propOperation.getValue("rememberMe"), true);
+		return isElementClickable(propOperation.getValue("rememberMe"), true);
 	}
 	
 	public boolean isForgatePasswordClickable() {
-		return isClickable(propOperation.getValue("forgotPassword"), true);
+		return isElementClickable(propOperation.getValue("forgotPassword"), true);
 	}
 	
 	public boolean isSignInBtnClickable() {
-		return isClickable(propOperation.getValue("btnSignIn"), true);
+		return isElementClickable(propOperation.getValue("btnSignIn"), true);
 	}
 	
 	public void enterEmail(String email) {
-		sendText(propOperation.getValue("emailField"), email, true );
+		setText(propOperation.getValue("emailField"), true, email );
 	}
 	
 	public void enterPassword(String password) {
-		sendText(propOperation.getValue("passwordField"), password, true );
+		setText(propOperation.getValue("passwordField"), true, password );
 	}
 	
 	public void clickOnSignIn() {
@@ -54,6 +54,6 @@ public class LoginPage extends PredefinedActions {
 	}
 	
 	public boolean isErrorMessageVisible() {
-		return isDisplayed(propOperation.getValue("invalidCredentialErrorMsg"), true);
+		return isElementDisplayed(propOperation.getValue("invalidCredentialErrorMsg"), true);
 	}
 }

@@ -12,6 +12,6 @@ public PropOperation propOperation;
 	}
 	
 	public boolean isUserNameVisible() {
-		return isDisplayed(propOperation.getValue("userName"), true);
+		return isElementDisplayed(propOperation.getValue("userName"), true);
 	}
 }
