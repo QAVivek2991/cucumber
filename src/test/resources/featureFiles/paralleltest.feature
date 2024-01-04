@@ -17,7 +17,7 @@
 ## (Comments)
 #Sample Feature Definition Template
 @tag
-Feature: Title of your feature
+Feature: Parallel test 
   I want to use this template for my feature file
   
  @runthis

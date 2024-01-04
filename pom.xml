@@ -68,12 +68,6 @@
 			<version>3.8.5</version> <!-- Replace with the latest version -->
 		</dependency>
 
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
-			<version>3.3.0</version> <!-- Replace with the latest version -->
-		</dependency>
-
 
 	</dependencies>
 

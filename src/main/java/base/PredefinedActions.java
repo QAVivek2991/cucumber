@@ -28,6 +28,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import constant.ConstantPath;
 import customException.InvalidLocatorType;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import stepDefination.AutomationHooks;
@@ -62,69 +63,57 @@ public class PredefinedActions {
 	}
 
 	public void configureSelenium(String browser, String useWebDriverManager) {
-		if (useWebDriverManager.equals("true")) {
+		if (useWebDriverManager.equals("false")) {
 			switch (browser.toLowerCase()) {
 			case "chrome":
-				WebDriverManager.chromedriver().setup();
+				System.setProperty("webdriver.chrome.driver", ConstantPath.CHROMEDRIVER);
 				webDriver.set(ThreadGuard.protect(new ChromeDriver()));
-				// webDriver = new ChromeDriver();
 				break;
 			case "firefox":
-				WebDriverManager.firefoxdriver().setup();
+				System.setProperty("webdriver.gecko.driver", ConstantPath.GICODRIVER);
 				webDriver.set(ThreadGuard.protect(new FirefoxDriver()));
-				// webDriver = new FirefoxDriver();
 				break;
 			case "edge":
-				WebDriverManager.edgedriver().setup();
+				System.setProperty("webdriver.edge.driver", ConstantPath.EDGEDRIVER);
 				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
-				// webDriver = new EdgeDriver();
 				break;
 			default:
-				WebDriverManager.edgedriver().setup();
+				System.setProperty("webdriver.edge.driver", ConstantPath.EDGEDRIVER);
 				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
-				// webDriver = new EdgeDriver();
 				break;
 			}
 		} else {
 			switch (browser.toLowerCase()) {
 			case "chrome":
-				System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+				WebDriverManager.chromedriver().setup();
 				webDriver.set(ThreadGuard.protect(new ChromeDriver()));
-				// webDriver = new ChromeDriver();
 				break;
 			case "firefox":
-				System.setProperty("webdriver.gecko.driver", "path/to/geckodriver");
+				WebDriverManager.firefoxdriver().setup();
 				webDriver.set(ThreadGuard.protect(new FirefoxDriver()));
-				// webDriver = new FirefoxDriver();
 				break;
 			case "edge":
-				System.setProperty("webdriver.edge.driver", "path/to/msedgedriver");
+				WebDriverManager.edgedriver().setup();
 				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
-				// webDriver = new EdgeDriver();
 				break;
 			default:
-				System.setProperty("webdriver.edge.driver", "path/to/msedgedriver");
+				WebDriverManager.edgedriver().setup();
 				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
-				// webDriver = new EdgeDriver();
 				break;
-
 			}
 		}
 	}
 
 	public void openWebSite(String url) throws IOException, XmlPullParserException {
 		String browserName = AutomationHooks.browserName;
-		System.out.println("Browser - " + browserName);
 		String useWebdriverManager = AutomationHooks.useWebdriverManager;
-		System.out.println("Webdriver - " + useWebdriverManager);
-		configureSelenium(AutomationHooks.browserName, useWebdriverManager);
-		//configureSelenium("chrome", "true");
+		configureSelenium(browserName, useWebdriverManager);
 		getDriver().manage().window().maximize();
 		getDriver().get(url);
 	}
 
 	public void start() throws IOException, XmlPullParserException {
-		openWebSite("https://staging.connect.pressurepro.us/");
+		openWebSite(ConstantPath.CONNECT_URL);
 	}
 
 	public void tearDown() {
