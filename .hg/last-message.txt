@@ -1,1 +1,2 @@
-update in last commit
+
+added .hgignore

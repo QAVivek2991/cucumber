@@ -20,6 +20,7 @@ public class AutomationHooks {
 		browserName = System.getProperty("browserName", "defaultValue");
 		useWebdriverManager = System.getProperty("useWebdriverManager", "defaultValue");
 		predefinedActions.start();
+
 	}
 
 	@After
@@ -27,6 +28,7 @@ public class AutomationHooks {
 		if (scenario.isFailed()) {
 			scenario.attach(predefinedActions.takeScreenshot(), "image/jpeg", "Screen Shot");
 		}
+
 		predefinedActions.tearDown();
 	}
 }
