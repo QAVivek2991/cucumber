@@ -1,2 +1,1 @@
-
-added .hgignore
+removed pdf extent report

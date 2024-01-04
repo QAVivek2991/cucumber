@@ -12,7 +12,7 @@ import io.cucumber.junit.CucumberOptions;
 					strict = true, 
 					tags = "@tag", 
 					plugin = {
-		"json:C:/Users/Vive.Kumar/eclipse-workspace1/cucumberTemplate/target/cucumber/1.json", "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"})
+		"json:C:/Users/Vive.Kumar/eclipse-workspace1/cucumberTemplate/target/cucumber/1.json"})
 
 public class RunnerClass {
 
