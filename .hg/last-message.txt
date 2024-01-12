@@ -1,1 +1,1 @@
-removed pdf extent report
+added a option to run headless and create jira ticket

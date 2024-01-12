@@ -1,4 +1,4 @@
-package stepDefination;
+package stepDefinition;
 
 import org.junit.Assert;
 import io.cucumber.java.en.Then;

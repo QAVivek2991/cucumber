@@ -6,14 +6,16 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(features = "./src/test/resources/featureFiles", 
-					glue = "stepDefination", 
+					glue = "stepDefinition", 
 					dryRun = false, 
 					monochrome = true, 
 					strict = true, 
-					tags = "@tag", 
+					tags = "@runthis", 
 					plugin = {
-		"json:C:/Users/Vive.Kumar/eclipse-workspace1/cucumberTemplate/target/cucumber/1.json"})
+		"json:C:/Users/Vive.Kumar/eclipse-workspace1/cucumberTemplate/target/cucumber/1.json"
+							})
 
 public class RunnerClass {
+	
 
 }

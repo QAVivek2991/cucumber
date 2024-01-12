@@ -27,7 +27,7 @@ Feature: Login page features for connect panel
     And Verify that connect text is visible
     And Verify placeholder of email and password field
     
-	
+	 @runthis
 	Scenario: Verify Remember me, Sine in button and Forgot Password is clickable
 		Then Verify that Remember me is clickable
 		And Verify that Forgate Password is clickable

@@ -31,7 +31,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import constant.ConstantPath;
 import customException.InvalidLocatorType;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import stepDefination.AutomationHooks;
+import stepDefinition.AutomationHooks;
+
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class PredefinedActions {
 
@@ -62,43 +66,56 @@ public class PredefinedActions {
 		}
 	}
 
-	public void configureSelenium(String browser, String useWebDriverManager) {
-		if (useWebDriverManager.equals("false")) {
+	public void configureSelenium(String browser, boolean useWebDriverManager, boolean runHeadless) {
+		ChromeOptions chromeOptions = new ChromeOptions();
+		chromeOptions.addArguments("--headless");
+
+		EdgeOptions edgeOptions = new EdgeOptions();
+		edgeOptions.addArguments("--headless");
+
+		FirefoxOptions firefoxOptions = new FirefoxOptions();
+		firefoxOptions.addArguments("--headless");
+
+		if (useWebDriverManager == false) {
 			switch (browser.toLowerCase()) {
 			case "chrome":
 				System.setProperty("webdriver.chrome.driver", ConstantPath.CHROMEDRIVER);
-				webDriver.set(ThreadGuard.protect(new ChromeDriver()));
+				webDriver
+						.set(ThreadGuard.protect((runHeadless) ? new ChromeDriver(chromeOptions) : new ChromeDriver()));
 				break;
 			case "firefox":
 				System.setProperty("webdriver.gecko.driver", ConstantPath.GICODRIVER);
-				webDriver.set(ThreadGuard.protect(new FirefoxDriver()));
+				webDriver.set(
+						ThreadGuard.protect((runHeadless) ? new FirefoxDriver(firefoxOptions) : new FirefoxDriver()));
 				break;
 			case "edge":
 				System.setProperty("webdriver.edge.driver", ConstantPath.EDGEDRIVER);
-				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
+				webDriver.set(ThreadGuard.protect((runHeadless) ? new EdgeDriver(edgeOptions) : new EdgeDriver()));
 				break;
 			default:
 				System.setProperty("webdriver.edge.driver", ConstantPath.EDGEDRIVER);
-				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
+				webDriver.set(ThreadGuard.protect((runHeadless) ? new EdgeDriver(edgeOptions) : new EdgeDriver()));
 				break;
 			}
 		} else {
 			switch (browser.toLowerCase()) {
 			case "chrome":
 				WebDriverManager.chromedriver().setup();
-				webDriver.set(ThreadGuard.protect(new ChromeDriver()));
+				webDriver
+						.set(ThreadGuard.protect((runHeadless) ? new ChromeDriver(chromeOptions) : new ChromeDriver()));
 				break;
 			case "firefox":
 				WebDriverManager.firefoxdriver().setup();
-				webDriver.set(ThreadGuard.protect(new FirefoxDriver()));
+				webDriver.set(
+						ThreadGuard.protect((runHeadless) ? new FirefoxDriver(firefoxOptions) : new FirefoxDriver()));
 				break;
 			case "edge":
 				WebDriverManager.edgedriver().setup();
-				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
+				webDriver.set(ThreadGuard.protect((runHeadless) ? new EdgeDriver(edgeOptions) : new EdgeDriver()));
 				break;
 			default:
 				WebDriverManager.edgedriver().setup();
-				webDriver.set(ThreadGuard.protect(new EdgeDriver()));
+				webDriver.set(ThreadGuard.protect((runHeadless) ? new EdgeDriver(edgeOptions) : new EdgeDriver()));
 				break;
 			}
 		}
@@ -106,8 +123,9 @@ public class PredefinedActions {
 
 	public void openWebSite(String url) throws IOException, XmlPullParserException {
 		String browserName = AutomationHooks.browserName;
-		String useWebdriverManager = AutomationHooks.useWebdriverManager;
-		configureSelenium(browserName, useWebdriverManager);
+		boolean useWebdriverManager = AutomationHooks.useWebdriverManager;
+		boolean runHeadless = AutomationHooks.runHeadless;
+		configureSelenium(browserName, useWebdriverManager, runHeadless);
 		getDriver().manage().window().maximize();
 		getDriver().get(url);
 	}
