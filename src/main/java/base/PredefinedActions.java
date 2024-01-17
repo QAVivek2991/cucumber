@@ -67,57 +67,46 @@ public class PredefinedActions {
 	}
 
 	public void configureSelenium(String browser, boolean useWebDriverManager, boolean runHeadless) {
+
 		ChromeOptions chromeOptions = new ChromeOptions();
-		chromeOptions.addArguments("--headless");
-
 		EdgeOptions edgeOptions = new EdgeOptions();
-		edgeOptions.addArguments("--headless");
-
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
-		firefoxOptions.addArguments("--headless");
 
-		if (useWebDriverManager == false) {
-			switch (browser.toLowerCase()) {
-			case "chrome":
-				System.setProperty("webdriver.chrome.driver", ConstantPath.CHROMEDRIVER);
-				webDriver
-						.set(ThreadGuard.protect((runHeadless) ? new ChromeDriver(chromeOptions) : new ChromeDriver()));
-				break;
-			case "firefox":
-				System.setProperty("webdriver.gecko.driver", ConstantPath.GICODRIVER);
-				webDriver.set(
-						ThreadGuard.protect((runHeadless) ? new FirefoxDriver(firefoxOptions) : new FirefoxDriver()));
-				break;
-			case "edge":
-				System.setProperty("webdriver.edge.driver", ConstantPath.EDGEDRIVER);
-				webDriver.set(ThreadGuard.protect((runHeadless) ? new EdgeDriver(edgeOptions) : new EdgeDriver()));
-				break;
-			default:
-				System.setProperty("webdriver.edge.driver", ConstantPath.EDGEDRIVER);
-				webDriver.set(ThreadGuard.protect((runHeadless) ? new EdgeDriver(edgeOptions) : new EdgeDriver()));
-				break;
-			}
-		} else {
-			switch (browser.toLowerCase()) {
-			case "chrome":
+		if (runHeadless) {
+			chromeOptions.addArguments("--headless");
+			edgeOptions.addArguments("--headless");
+			firefoxOptions.addArguments("--headless");
+		}
+
+		switch (browser.toLowerCase()) {
+		case "chrome":
+			if (useWebDriverManager)
 				WebDriverManager.chromedriver().setup();
-				webDriver
-						.set(ThreadGuard.protect((runHeadless) ? new ChromeDriver(chromeOptions) : new ChromeDriver()));
-				break;
-			case "firefox":
+			else
+				System.setProperty("webdriver.chrome.driver", ConstantPath.CHROMEDRIVER);
+			webDriver.set(ThreadGuard.protect(new ChromeDriver(chromeOptions)));
+			break;
+		case "firefox":
+			if (useWebDriverManager)
 				WebDriverManager.firefoxdriver().setup();
-				webDriver.set(
-						ThreadGuard.protect((runHeadless) ? new FirefoxDriver(firefoxOptions) : new FirefoxDriver()));
-				break;
-			case "edge":
+			else
+				System.setProperty("webdriver.gecko.driver", ConstantPath.GICODRIVER);
+			webDriver.set(ThreadGuard.protect(new FirefoxDriver(firefoxOptions)));
+			break;
+		case "edge":
+			if (useWebDriverManager)
 				WebDriverManager.edgedriver().setup();
-				webDriver.set(ThreadGuard.protect((runHeadless) ? new EdgeDriver(edgeOptions) : new EdgeDriver()));
-				break;
-			default:
+			else
+				System.setProperty("webdriver.edge.driver", ConstantPath.EDGEDRIVER);
+			webDriver.set(ThreadGuard.protect(new EdgeDriver(edgeOptions)));
+			break;
+		default:
+			if (useWebDriverManager)
 				WebDriverManager.edgedriver().setup();
-				webDriver.set(ThreadGuard.protect((runHeadless) ? new EdgeDriver(edgeOptions) : new EdgeDriver()));
-				break;
-			}
+			else
+				System.setProperty("webdriver.edge.driver", ConstantPath.EDGEDRIVER);
+			webDriver.set(ThreadGuard.protect(new EdgeDriver(edgeOptions)));
+			break;
 		}
 	}
 
@@ -148,6 +137,8 @@ public class PredefinedActions {
 			return By.xpath(locatorValue);
 		case "ID":
 			return By.id(locatorValue);
+		case "CLASS":
+			return By.className(locatorValue);		
 		case "CSS":
 			return By.cssSelector(locatorValue);
 		default:

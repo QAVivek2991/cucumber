@@ -39,7 +39,7 @@ public class AutomationHooks {
 		if (scenario.isFailed()) {
 			scenario.attach(predefinedActions.takeScreenshot(), "image/jpeg", "Screen Shot");
 			//System.out.println("Scenario - "+scenario.getName());
-			createJiraTicket(scenario.getName());
+			//createJiraTicket(scenario.getName());
 		}
 
 		predefinedActions.tearDown();
