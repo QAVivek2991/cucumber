@@ -28,8 +28,8 @@ public class AutomationHooks {
 	@Before
 	public void setUp() throws IOException, XmlPullParserException {
 		browserName = System.getProperty("browserName", "defaultValue");
-		useWebdriverManager = Boolean.parseBoolean(System.getProperty("useWebdriverManager", "defaultValue"));
-		runHeadless = Boolean.parseBoolean(System.getProperty("runHeadless", "defaultValue"));
+		useWebdriverManager = Boolean.parseBoolean(System.getProperty("useWebdriverManager", "true"));
+		runHeadless = Boolean.parseBoolean(System.getProperty("runHeadless", "false"));
 		predefinedActions.start();
 
 	}

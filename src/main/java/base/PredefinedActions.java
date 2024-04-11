@@ -131,7 +131,7 @@ public class PredefinedActions {
 		String[] temp = locator.split("]:-");
 		String locatorType = temp[0].replace("[", "").toUpperCase();
 		String locatorValue = temp[1];
-
+		
 		switch (locatorType) {
 		case "XPATH":
 			return By.xpath(locatorValue);
@@ -144,7 +144,6 @@ public class PredefinedActions {
 		default:
 			throw new InvalidLocatorType(locatorType + " is not valid");
 		}
-
 	}
 
 	protected WebElement getElement(String locator, boolean isWaitRequired) {

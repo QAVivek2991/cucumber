@@ -12,7 +12,6 @@ public class LoginSteps {
 	@Then("^Verify that logo is visible$")
 	public void verify_that_logo_is_visible() {
 		Assert.assertTrue("Logo not visible", loginPage.isLogoVisible());
-
 	}
 
 	@Then("^Verify that connect text is visible$")
